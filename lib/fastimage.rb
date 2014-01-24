@@ -261,11 +261,11 @@ class FastImage
   end
 
   def fetch_using_read(readable)
-    @read_fiber = Fiber.new do
-      while str = readable.read(LocalFileChunkSize)
-        Fiber.yield str
+    @read_fiber = Struct.new(:readable) do
+      def resume
+        readable.read(LocalFileChunkSize)
       end
-    end
+    end.new(readable)
 
     parse_packets
   end
